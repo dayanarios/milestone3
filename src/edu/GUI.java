@@ -84,6 +84,7 @@ public class GUI extends javax.swing.JFrame {
         booleanButton = new javax.swing.JRadioButton();
         rankedButton = new javax.swing.JRadioButton();
         formulaComboBox = new javax.swing.JComboBox<>();
+        PrecisionRecall = new javax.swing.JRadioButton();
 
         DirectoryDialogBox.setTitle("Select Directory");
         DirectoryDialogBox.setMinimumSize(new java.awt.Dimension(360, 208));
@@ -404,6 +405,13 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        PrecisionRecall.setText("Precision-Recall");
+        PrecisionRecall.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                PrecisionRecallActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout FeaturesPanelLayout = new javax.swing.GroupLayout(FeaturesPanel);
         FeaturesPanel.setLayout(FeaturesPanelLayout);
         FeaturesPanelLayout.setHorizontalGroup(
@@ -413,7 +421,9 @@ public class GUI extends javax.swing.JFrame {
                 .addComponent(booleanButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(rankedButton)
-                .addGap(10, 10, 10)
+                .addGap(2, 2, 2)
+                .addComponent(PrecisionRecall)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(formulaComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -424,7 +434,8 @@ public class GUI extends javax.swing.JFrame {
                 .addGroup(FeaturesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(booleanButton)
                     .addComponent(rankedButton)
-                    .addComponent(formulaComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(formulaComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(PrecisionRecall))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -509,22 +520,38 @@ public class GUI extends javax.swing.JFrame {
      */
     private void SearchBarTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SearchBarTextFieldActionPerformed
 
-        // TODO add your handling code here:
-        DocumentIndexer.query = SearchBarTextField.getText();
-        try {
-            if (!DocumentIndexer.newCorpus()) {
-
+        if(DocumentIndexer.prMode){
+            DocumentIndexer.query = SearchBarTextField.getText();
+            try {
                 DocumentIndexer.startSearchEngine();
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InstantiationException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
             }
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         }
+        else{
+            DocumentIndexer.query = SearchBarTextField.getText();
+            try {
+                if (!DocumentIndexer.newCorpus()) {
+
+                    DocumentIndexer.startSearchEngine();
+                }
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InstantiationException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
 
     }//GEN-LAST:event_SearchBarTextFieldActionPerformed
 
@@ -577,7 +604,8 @@ public class GUI extends javax.swing.JFrame {
     private void booleanButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_booleanButtonActionPerformed
 
         DocumentIndexer.booleanMode = true;
-        DocumentIndexer.rankedMode = false; 
+        DocumentIndexer.rankedMode = false;
+        DocumentIndexer.prMode = false; 
         
     }//GEN-LAST:event_booleanButtonActionPerformed
 
@@ -589,6 +617,7 @@ public class GUI extends javax.swing.JFrame {
 
         DocumentIndexer.booleanMode = false;
         DocumentIndexer.rankedMode = true; 
+        DocumentIndexer.prMode = false; 
         
     }//GEN-LAST:event_rankedButtonActionPerformed
 
@@ -596,6 +625,13 @@ public class GUI extends javax.swing.JFrame {
         // TODO add your handling code here:
         DocumentIndexer.rankedOption = formulaComboBox.getSelectedIndex();
     }//GEN-LAST:event_formulaComboBoxActionPerformed
+
+    private void PrecisionRecallActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_PrecisionRecallActionPerformed
+        // TODO add your handling code here:
+        DocumentIndexer.booleanMode = false;
+        DocumentIndexer.rankedMode = false;
+        DocumentIndexer.prMode = true; 
+    }//GEN-LAST:event_PrecisionRecallActionPerformed
 
     /**
      * @param args the command line arguments
@@ -625,6 +661,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JLabel DirectoryDirectionsLabel;
     private javax.swing.JPanel FeaturesPanel;
     private javax.swing.JPanel FrameFootnotes;
+    private javax.swing.JRadioButton PrecisionRecall;
     private javax.swing.JLabel ProjectTitleLabel;
     protected static javax.swing.JList<String> ResultsJList;
     protected static javax.swing.JList<String> ResultsJList1;

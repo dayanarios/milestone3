@@ -5,6 +5,7 @@
  */
 package edu;
 
+import MAP.MAP;
 import Strategy.StrategyFactory;
 import Strategy.StrategyInterface;
 import cecs429.documents.DirectoryCorpus;
@@ -35,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Set;
 import javax.swing.JOptionPane;
 
 /**
@@ -52,12 +54,17 @@ public class DocumentIndexer {
     protected static Boolean rankedMode = false;
     protected static Boolean queryMode = true;
     protected static Boolean buildMode = false;
+    protected static Boolean prMode = false; 
     private int topK = 10; //search engine always returns the top K = 10 docs
     private static double N = 0; //corpus size
     private static String path;
     protected static int rankedOption = 0;
     private static DiskPositionalIndex Disk_posIndex;
     private static DiskIndexWriter diskWriter = new DiskIndexWriter();
+    private HashMap<String, List> qRel = new HashMap<String, List>(); 
+    private HashMap<String, List> poseRel = new HashMap<String, List>(); 
+    protected static String qRel_path = "/Users/dayanarios/relevance_parks/relevance/qrel.txt"; 
+    protected static String queries_path = "/Users/dayanarios/relevance_parks/relevance/queries.txt";
 
     /**
      * Indexes the corpus given by the path parameter, records the time it takes
@@ -102,9 +109,12 @@ public class DocumentIndexer {
 
         if (booleanMode) {
             BooleanQueryMode(diskWriter, Disk_posIndex);
-        } else {
+        } else if(rankedMode){
 
             RankedQueryMode(diskWriter, Disk_posIndex);
+        }
+        else{
+            prMode(diskWriter, Disk_posIndex);
         }
 
     }
@@ -456,4 +466,143 @@ public class DocumentIndexer {
         }
         return false;
     }
+    
+
+    
+    private static void prMode(DiskIndexWriter diskWriter, DiskPositionalIndex disk_posIndex) throws ClassNotFoundException, InstantiationException, IllegalAccessException{
+        System.out.print(qRel_path + "\n");
+        System.out.print(queries_path); 
+        GUI.JListModel.clear();
+        
+        /*
+        *   Ranked Retrieval as normal but stores results in an array
+        */
+        if (query.equals("q")) {
+
+            System.exit(0);
+        }
+        
+        MAP mean_ap = new MAP(qRel_path,queries_path);
+        Set<String> queries = mean_ap.getQueries();
+        
+        //run ranked retrival for each query
+        for (String q : queries){
+            List<String> word = new ArrayList();
+            query = q; 
+            String[] query_array = query.split("\\s+");
+            TokenProcessor processor = new NewTokenProcessor();
+
+            for (int i = 0; i < query_array.length; i++) {
+                word.add(processor.processToken(query_array[i]).get(0));
+            }
+
+            StrategyFactory sf = new StrategyFactory();
+            StrategyInterface strategy = sf.execute(rankedOption);
+
+            //maps postings to accumulator value
+            HashMap<Integer, Doc_accum> postingMap = new HashMap<Integer, Doc_accum>();
+
+            PriorityQueue<Doc_accum> queue = new PriorityQueue<>(Collections.reverseOrder());
+
+            List<Posting> postings = new ArrayList<>();
+            List<Doc_accum> results = new ArrayList<>();
+
+            for (String term : word) {
+
+                postings = disk_posIndex.getPosting_noPos(term);
+                for (Posting p : postings) { //for each document in the postings list
+                    double t_fd = p.getT_fd();
+                    double d_ft = p.getD_ft();
+                    double w_qt = strategy.calculate_wqt(N, d_ft);
+                    double accum = 0;
+                    double w_dt = strategy.get_wdt(t_fd, disk_posIndex, p.getDocumentId());
+
+                    //pairs (Ranked_posting, accumulator factor)
+                    if (postingMap.containsKey(p.getDocumentId())) {
+                        accum = postingMap.get(p.getDocumentId()).getAccumulator();
+                        accum += (w_qt * w_dt);
+                        postingMap.replace(p.getDocumentId(), new Doc_accum(p, accum)); //replaces old accum value
+
+                    } else {
+                        accum += (w_qt * w_dt);
+                        postingMap.put(p.getDocumentId(), new Doc_accum(p, accum));
+                    }
+                }
+
+            }
+
+            for (Integer p : postingMap.keySet()) {
+                Doc_accum doc_temp = postingMap.get(p);
+                double accum = doc_temp.getAccumulator(); //gets accum associated with doc
+
+                if (accum > 0) {
+                    //search for each p's Ld factor in docWeights.bin
+                    double l_d = strategy.calculate_Ld(disk_posIndex, doc_temp.getPosting().getDocumentId());
+
+                    accum /= l_d;
+                    doc_temp.setAccumulator(accum);
+                }
+
+                queue.add(postingMap.get(p));
+
+            }
+
+            //returns top K=10 results 
+            int topK = 50;
+
+            while ((results.size() < topK) && queue.size() > 0) {
+
+                results.add(queue.poll());  //gets the posting acc pair and returns only posting
+
+            }
+
+            List<String> filenames = get_RankedResults(results); 
+            
+           
+            mean_ap.add_poseRel(q, filenames);
+            
+        } 
+        
+        
+    }
+    
+    public static List<String> get_RankedResults(List<Doc_accum> results) {
+        List<String> filenames = new ArrayList(); 
+        
+        if (results.isEmpty()) {
+            GUI.JListModel.clear();
+            GUI.ResultsLabel.setText("");
+            clickList = false;
+
+            String notFound = "Your search '" + query + "' is not found in any documents";
+            GUI.ResultsLabel.setText(notFound);
+
+        } else {
+            clickList = false;
+
+            //clears list and repopulates it 
+            String docInfo;
+
+            GUI.JListModel.clear();
+            GUI.ResultsLabel.setText("");
+
+            for (Doc_accum p : results) {
+                if (queryMode) {
+                    corpus.getDocument(p.getPosting().getDocumentId()).getContent();
+                }
+                //docInfo = corpus.getDocument(p.getPosting().getDocumentId()).getTitle();
+                docInfo = corpus.getDocument(p.getPosting().getDocumentId()).getFileName().toString();
+                filenames.add(docInfo); 
+
+            }
+            GUI.ResultsLabel.setText("Total Documents Found: " + results.size());
+        }
+
+        //GUI.SearchBarTextField.setText("Enter a new search or 'q' to exit");
+        GUI.SearchBarTextField.selectAll();
+        
+        return filenames; 
+    }
+
+    
 }

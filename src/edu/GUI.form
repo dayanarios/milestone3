@@ -635,7 +635,9 @@
                   <Component id="booleanButton" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="rankedButton" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="2" max="-2" attributes="0"/>
+                  <Component id="PrecisionRecall" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
                   <Component id="formulaComboBox" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -649,6 +651,7 @@
                       <Component id="booleanButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="rankedButton" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="formulaComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="PrecisionRecall" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -698,6 +701,14 @@
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="PrecisionRecall">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Precision-Recall"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="PrecisionRecallActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
