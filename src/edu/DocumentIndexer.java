@@ -63,8 +63,7 @@ public class DocumentIndexer {
     private static DiskIndexWriter diskWriter = new DiskIndexWriter();
     private HashMap<String, List> qRel = new HashMap<String, List>(); 
     private HashMap<String, List> poseRel = new HashMap<String, List>(); 
-    protected static String qRel_path = "/Users/dayanarios/relevance_parks/relevance/qrel.txt"; 
-    protected static String queries_path = "/Users/dayanarios/relevance_parks/relevance/queries.txt";
+
 
     /**
      * Indexes the corpus given by the path parameter, records the time it takes
@@ -242,7 +241,7 @@ public class DocumentIndexer {
         }
 
         //returns top K=10 results 
-        int topK = 10;
+        int topK = 50;
 
         while ((results.size() < topK) && queue.size() > 0) {
 
@@ -276,8 +275,8 @@ public class DocumentIndexer {
                 if (queryMode) {
                     corpus.getDocument(p.getPosting().getDocumentId()).getContent();
                 }
-                docInfo = corpus.getDocument(p.getPosting().getDocumentId()).getTitle();
-                //docInfo = corpus.getDocument(p.getPosting().getDocumentId()).getFileName().toString();
+                //docInfo = corpus.getDocument(p.getPosting().getDocumentId()).getTitle();
+                docInfo = corpus.getDocument(p.getPosting().getDocumentId()).getFileName().toString();
                 docInfo += " " + p.getAccumulator();
                 GUI.JListModel.addElement(docInfo);
 
@@ -469,9 +468,8 @@ public class DocumentIndexer {
     
 
     
-    private static void prMode(DiskIndexWriter diskWriter, DiskPositionalIndex disk_posIndex) throws ClassNotFoundException, InstantiationException, IllegalAccessException{
-        System.out.print(qRel_path + "\n");
-        System.out.print(queries_path); 
+    private static void prMode(DiskIndexWriter diskWriter, DiskPositionalIndex disk_posIndex) throws ClassNotFoundException, InstantiationException, IllegalAccessException, FileNotFoundException{
+
         GUI.JListModel.clear();
         
         /*
@@ -482,7 +480,7 @@ public class DocumentIndexer {
             System.exit(0);
         }
         
-        MAP mean_ap = new MAP(qRel_path,queries_path);
+        MAP mean_ap = new MAP();
         Set<String> queries = mean_ap.getQueries();
         
         //run ranked retrival for each query
@@ -561,7 +559,9 @@ public class DocumentIndexer {
            
             mean_ap.add_poseRel(q, filenames);
             
-        } 
+        }
+        //mean_ap.calc_avgPrecision();
+        System.out.println("\nMean average precision: " +mean_ap.mean_ap());
         
         
     }
