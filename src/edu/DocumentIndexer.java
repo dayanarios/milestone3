@@ -483,7 +483,7 @@ public class DocumentIndexer {
         MAP mean_ap = new MAP();
         //returns qRel.keyset() i.e. queries 
         Set<String> queries = mean_ap.getQueries();
-        
+        long start_time=System.nanoTime();
         //run ranked retrival for each query
         for (String q : queries){
             List<String> word = new ArrayList();
@@ -559,12 +559,13 @@ public class DocumentIndexer {
             //testing
           //  System.out.println(q);
             mean_ap.add_poseRel(q, filenames);
-            
+           
         }
-        //mean_ap.calc_avgPrecision();
-        System.out.println("\nMean average precision: " +mean_ap.mean_ap());
-        
-        
+            long end_time=System.nanoTime();
+            System.out.println("\nMean average precision: " +mean_ap.mean_ap());
+            long total_time=end_time-start_time;
+            System.out.println("Throughput of the system is: " + mean_ap.calculate_throughput(total_time));
+            System.out.println("Mean Response Time of the system is: " + mean_ap.calculae_mean_response_time(total_time));
     }
     
     public static List<String> get_RankedResults(List<Doc_accum> results) {

@@ -7,6 +7,8 @@ package MAP;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import static java.lang.Math.round;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +20,6 @@ import java.util.Set;
  * @author dayanarios
  */
 public class MAP {
-
     private static String qRel_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance\\relevance\\qrel";
     private static String queries_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance\\relevance\\queries";
     private HashMap<String, List> qRel = new HashMap();
@@ -26,21 +27,9 @@ public class MAP {
     List <Integer> test = new ArrayList(); 
     double numQueries = 0; 
     List <Double> avgPrecisions = new ArrayList(); 
-    
+
     public MAP() throws FileNotFoundException {
-        test.add(13165);                        
-        test.add(13177);
-        test.add(22599);
-        test.add(11839);
-        test.add(11845);
-        test.add(11858);
-        test.add(11871);
-        test.add(11883);
-        test.add(16398);
-        test.add(13360);
-        test.add(13361);
-        test.add(13371);
-        test.add(13385);
+       
         readFiles();
     }
 
@@ -157,8 +146,19 @@ public class MAP {
         }
         return (sum / numQueries);
     }
-
-
+    
+    public double calculae_mean_response_time(long time){
+        double seconds = (double) time / 1000000000.0;
+        double mean_time= (seconds/numQueries);
+        return mean_time ;
+    }
+    public double calculate_throughput(long time){
+        double seconds = (double) time / 1000000000.0;
+        double throughput= numQueries/seconds ;
+        
+        return throughput;
+        
+    }
 }
 
 
