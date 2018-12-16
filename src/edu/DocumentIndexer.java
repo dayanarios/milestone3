@@ -481,6 +481,7 @@ public class DocumentIndexer {
         }
         
         MAP mean_ap = new MAP();
+        //returns qRel.keyset() i.e. queries 
         Set<String> queries = mean_ap.getQueries();
         
         //run ranked retrival for each query
@@ -555,8 +556,8 @@ public class DocumentIndexer {
             }
 
             List<String> filenames = get_RankedResults(results); 
-            
-           
+            //testing
+          //  System.out.println(q);
             mean_ap.add_poseRel(q, filenames);
             
         }
