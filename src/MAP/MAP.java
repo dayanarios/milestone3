@@ -20,8 +20,8 @@ import java.util.Set;
  * @author dayanarios
  */
 public class MAP {
-    private static String qRel_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance\\relevance\\qrel";
-    private static String queries_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance\\relevance\\queries";
+    private static String qRel_path = "/Users/dayanarios/relevance_cranfield/relevance/qrel.txt";
+    private static String queries_path = "/Users/dayanarios/relevance_cranfield/relevance/queries.txt";
     private HashMap<String, List> qRel = new HashMap();
     private HashMap<String, List> poseRel = new HashMap();
     List <Integer> test = new ArrayList(); 

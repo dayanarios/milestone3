@@ -684,6 +684,17 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rankedButtonActionPerformed"/>
           </Events>
         </Component>
+        <Component class="javax.swing.JRadioButton" name="PrecisionRecall">
+          <Properties>
+            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+              <ComponentRef name="modeButtonGroup"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Precision-Recall"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="PrecisionRecallActionPerformed"/>
+          </Events>
+        </Component>
         <Component class="javax.swing.JComboBox" name="formulaComboBox">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
@@ -701,14 +712,6 @@
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
-        </Component>
-        <Component class="javax.swing.JRadioButton" name="PrecisionRecall">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Precision-Recall"/>
-          </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="PrecisionRecallActionPerformed"/>
-          </Events>
         </Component>
       </SubComponents>
     </Container>
