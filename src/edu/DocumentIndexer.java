@@ -507,7 +507,10 @@ public class DocumentIndexer {
             List<Doc_accum> results = new ArrayList<>();
 
             for (String term : word) {
-
+                if(term.equals("")){
+                    continue;
+                }
+                else{
                 postings = disk_posIndex.getPosting_noPos(term);
                 for (Posting p : postings) { //for each document in the postings list
                     double t_fd = p.getT_fd();
@@ -528,7 +531,7 @@ public class DocumentIndexer {
                     }
                 }
 
-            }
+            }}
 
             for (Integer p : postingMap.keySet()) {
                 Doc_accum doc_temp = postingMap.get(p);

@@ -297,6 +297,7 @@ public class DiskPositionalIndex implements Index {
             m = (i + j) / 2;
 
             String s2 = "";
+            
             //go to vocabtable position m 
             vt.seek((m - 1) * 16);
 
