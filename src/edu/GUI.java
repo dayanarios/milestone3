@@ -83,8 +83,8 @@ public class GUI extends javax.swing.JFrame {
         FeaturesPanel = new javax.swing.JPanel();
         booleanButton = new javax.swing.JRadioButton();
         rankedButton = new javax.swing.JRadioButton();
-        formulaComboBox = new javax.swing.JComboBox<>();
         PrecisionRecall = new javax.swing.JRadioButton();
+        formulaComboBox = new javax.swing.JComboBox<>();
 
         DirectoryDialogBox.setTitle("Select Directory");
         DirectoryDialogBox.setMinimumSize(new java.awt.Dimension(360, 208));
@@ -398,17 +398,18 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
-        formulaComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Default", "tf-idf", "Okapi BM25", "Wacky" }));
-        formulaComboBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                formulaComboBoxActionPerformed(evt);
-            }
-        });
-
+        modeButtonGroup.add(PrecisionRecall);
         PrecisionRecall.setText("Precision-Recall");
         PrecisionRecall.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 PrecisionRecallActionPerformed(evt);
+            }
+        });
+
+        formulaComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Default", "tf-idf", "Okapi BM25", "Wacky" }));
+        formulaComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                formulaComboBoxActionPerformed(evt);
             }
         });
 
