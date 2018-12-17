@@ -63,7 +63,7 @@ public class DocumentIndexer {
     private static DiskIndexWriter diskWriter = new DiskIndexWriter();
     private HashMap<String, List> qRel = new HashMap<String, List>(); 
     private HashMap<String, List> poseRel = new HashMap<String, List>(); 
-
+    private static List <Double> tp = new ArrayList(); 
 
     /**
      * Indexes the corpus given by the path parameter, records the time it takes
@@ -277,6 +277,7 @@ public class DocumentIndexer {
                 }
                 //docInfo = corpus.getDocument(p.getPosting().getDocumentId()).getTitle();
                 docInfo = corpus.getDocument(p.getPosting().getDocumentId()).getFileName().toString();
+                //System.out.println(docInfo); 
                 docInfo += " " + p.getAccumulator();
                 GUI.JListModel.addElement(docInfo);
 
@@ -565,10 +566,23 @@ public class DocumentIndexer {
            
         }
             long end_time=System.nanoTime();
-            System.out.println("\nMean average precision: " +mean_ap.mean_ap());
+            double map_result = mean_ap.mean_ap();
+            String mapDisplay = "Mean average precision: " + map_result; 
+            GUI.JListModel.addElement(mapDisplay);
+            System.out.println("\n" + mapDisplay);
+            
             long total_time=end_time-start_time;
-            System.out.println("Throughput of the system is: " + mean_ap.calculate_throughput(total_time));
-            System.out.println("Mean Response Time of the system is: " + mean_ap.calculae_mean_response_time(total_time));
+            double throughput_result = mean_ap.calculate_throughput(total_time);
+            String throughput_Display = "Throughput of the system is: " + throughput_result;
+            GUI.JListModel.addElement(throughput_Display);
+            System.out.println(throughput_Display);
+            
+            double mrt_result = mean_ap.calculae_mean_response_time(total_time);
+            String mrt_Display = "Mean Response Time of the system is: " + mrt_result;
+            GUI.JListModel.addElement(mrt_Display);
+            System.out.println(mrt_Display);
+            
+
     }
     
     public static List<String> get_RankedResults(List<Doc_accum> results) {
@@ -600,7 +614,7 @@ public class DocumentIndexer {
                 filenames.add(docInfo); 
 
             }
-            GUI.ResultsLabel.setText("Total Documents Found: " + results.size());
+            //GUI.ResultsLabel.setText("Total Documents Found: " + results.size());
         }
 
         //GUI.SearchBarTextField.setText("Enter a new search or 'q' to exit");
@@ -608,6 +622,21 @@ public class DocumentIndexer {
         
         return filenames; 
     }
+    
+    public static void TP30(double time) {
+        tp.add(time);
+        System.out.println("iteration number: " + tp.size());
+
+        if (tp.size() == 30) {
+            double sum = 0;
+            for (double t : tp) {
+                sum += t;
+            }
+            double size = tp.size();
+            System.out.println("\nThroughput over 30 iterations: " + sum / size);
+        }
+    }
+
 
     
 }

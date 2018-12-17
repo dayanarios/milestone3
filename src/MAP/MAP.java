@@ -21,10 +21,14 @@ import java.util.Set;
  */
 public class MAP {
 
-//   private static String qRel_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance\\relevance\\qrel";
-//    private static String queries_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance\\relevance\\queries";
-    private static String qRel_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance_Cranfield\\relevance\\qrel";
-    private static String queries_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance_Cranfield\\relevance\\queries";
+    //private static String qRel_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance\\relevance\\qrel";
+    //private static String queries_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance\\relevance\\queries";
+    //private static String qRel_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance_Cranfield\\relevance\\qrel";
+    //private static String queries_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance_Cranfield\\relevance\\queries";
+    //private static String qRel_path = "/Users/dayanarios/relevance_parks/relevance/qrel.txt";
+    //private static String queries_path = "/Users/dayanarios/relevance_parks/relevance/queries.txt";
+    private static String qRel_path = "/Users/dayanarios/relevance_cranfield/relevance/qrel.txt";
+    private static String queries_path = "/Users/dayanarios/relevance_cranfield/relevance/queries.txt";
     
 
     private HashMap<String, List> qRel = new HashMap();
@@ -32,6 +36,9 @@ public class MAP {
     List <Integer> test = new ArrayList(); 
     double numQueries = 0; 
     List <Double> avgPrecisions = new ArrayList(); 
+    private List <Double> results = new ArrayList(); 
+    
+    
 
     public MAP() throws FileNotFoundException {
        
@@ -65,7 +72,7 @@ public class MAP {
 
     //add results from ranked retreival to hash map
     public void add_poseRel(String key, List<String> values) {
-        System.out.print(key + "\n");
+        //System.out.print(key + "\n");
         List<Integer> docs = new ArrayList();
 
         for (String s : values) {
@@ -91,7 +98,7 @@ public class MAP {
      */
     public void calc_avgPrecision() {
         for (String query : qRel.keySet()) {
-            System.out.println("\nPrecision of: " + query);;
+            //System.out.println("\nPrecision of: " + query);;
             numQueries++;
             List<Integer> relevant = qRel.get(query);
             List<Integer> candidates = poseRel.get(query);
@@ -100,7 +107,7 @@ public class MAP {
             
             List<Double> precisions = new ArrayList();
             
-            System.out.println("num of relevant docs: " +  relevant.size()); 
+            //System.out.println("num of relevant docs: " +  relevant.size()); 
             
             for (Integer doc : candidates) {
                 k++;
@@ -109,14 +116,14 @@ public class MAP {
                     p++;
                     double p_at_k = p / k;
                     double r_at_k = p/relevant.size();
-                    System.out.println("Doc : " + k + " P@K : " + p_at_k + " R@K : " + r_at_k);
+                    //System.out.println("Doc : " + doc + " P@" + k +": " + p_at_k + " R@" + k +" : " + r_at_k);
                     //System.out.print(" P@K :" + p_at_k);
                     precisions.add(p_at_k);
                 }
                 else{
                     double p_at_k = p / k;
                     double r_at_k = p/relevant.size();
-                    System.out.println("Doc : " + k + " P@K : " + p_at_k + " R@K : " + r_at_k); 
+                    //System.out.println("Doc : " + k + " P@K : " + p_at_k + " R@K : " + r_at_k); 
                     
                 }
             }
@@ -137,13 +144,13 @@ public class MAP {
             sum += p;
         }
         result=sum/rel;
-        System.out.println("Average precision for query: " + result);
+        //System.out.println("Average precision for query: " + result);
         return (result);
     }
 
     public Double mean_ap() {
         calc_avgPrecision();
-        System.out.println("\nnum of queries: " + numQueries);
+        //System.out.println("\nnum of queries: " + numQueries);
         double sum = 0;
         for (double ap : avgPrecisions) {
            // System.out.println("Average Precision: " + ap);
@@ -164,6 +171,8 @@ public class MAP {
         return throughput;
         
     }
+    
+
 }
 
 

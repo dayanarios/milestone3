@@ -309,7 +309,7 @@ public class DiskPositionalIndex implements Index {
 
             if (term.compareTo(s2) == 0) {
 
-                System.out.println("Found");
+                //System.out.println("Found");
                 Found = true;
                 // vt.seek(m * 16);
                 vt.seek((m - 1) * 16);
@@ -333,5 +333,5 @@ public class DiskPositionalIndex implements Index {
         }
         return result;
     }
-
+    
 }
