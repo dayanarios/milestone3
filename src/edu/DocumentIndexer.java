@@ -470,32 +470,36 @@ public class DocumentIndexer {
 
     
     private static void prMode(DiskIndexWriter diskWriter, DiskPositionalIndex disk_posIndex) throws ClassNotFoundException, InstantiationException, IllegalAccessException, FileNotFoundException{
-
+        long time=0;
         GUI.JListModel.clear();
-        
         /*
         *   Ranked Retrieval as normal but stores results in an array
         */
+       
         if (query.equals("q")) {
 
             System.exit(0);
         }
-        
-        MAP mean_ap = new MAP();
+        MAP mean_ap = new MAP(path);
         //returns qRel.keyset() i.e. queries 
         Set<String> queries = mean_ap.getQueries();
-        long start_time=System.nanoTime();
+        
         //run ranked retrival for each query
         for (String q : queries){
+            time=0;
             List<String> word = new ArrayList();
+            
             query = q; 
+            long start=System.currentTimeMillis();
+        
             String[] query_array = query.split("\\s+");
             TokenProcessor processor = new NewTokenProcessor();
 
             for (int i = 0; i < query_array.length; i++) {
                 word.add(processor.processToken(query_array[i]).get(0));
             }
-
+            long t1=System.currentTimeMillis();
+            time=t1-start; //time to parse
             StrategyFactory sf = new StrategyFactory();
             StrategyInterface strategy = sf.execute(rankedOption);
 
@@ -506,13 +510,19 @@ public class DocumentIndexer {
 
             List<Posting> postings = new ArrayList<>();
             List<Doc_accum> results = new ArrayList<>();
-
+            
             for (String term : word) {
+                    long t2=System.currentTimeMillis();   
+     
                 if(term.equals("")){
                     continue;
                 }
                 else{
-                postings = disk_posIndex.getPosting_noPos(term);
+                
+                    postings = disk_posIndex.getPosting_noPos(term);
+                   long t3=System.currentTimeMillis();
+                   time=time+(t3-t2);
+         
                 for (Posting p : postings) { //for each document in the postings list
                     double t_fd = p.getT_fd();
                     double d_ft = p.getD_ft();
@@ -533,7 +543,6 @@ public class DocumentIndexer {
                 }
 
             }}
-
             for (Integer p : postingMap.keySet()) {
                 Doc_accum doc_temp = postingMap.get(p);
                 double accum = doc_temp.getAccumulator(); //gets accum associated with doc
@@ -563,21 +572,22 @@ public class DocumentIndexer {
             //testing
           //  System.out.println(q);
             mean_ap.add_poseRel(q, filenames);
+                
            
         }
-            long end_time=System.nanoTime();
+            //long end_time=System.nanoTime();
             double map_result = mean_ap.mean_ap();
             String mapDisplay = "Mean average precision: " + map_result; 
             GUI.JListModel.addElement(mapDisplay);
             System.out.println("\n" + mapDisplay);
             
-            long total_time=end_time-start_time;
-            double throughput_result = mean_ap.calculate_throughput(total_time);
+            //long total_time=end_time-start_time;
+            double throughput_result = mean_ap.calculate_throughput(time);
             String throughput_Display = "Throughput of the system is: " + throughput_result;
             GUI.JListModel.addElement(throughput_Display);
             System.out.println(throughput_Display);
             
-            double mrt_result = mean_ap.calculae_mean_response_time(total_time);
+            double mrt_result = mean_ap.calculae_mean_response_time(time);
             String mrt_Display = "Mean Response Time of the system is: " + mrt_result;
             GUI.JListModel.addElement(mrt_Display);
             System.out.println(mrt_Display);

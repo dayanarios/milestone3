@@ -21,14 +21,9 @@ import java.util.Set;
  */
 public class MAP {
 
-    //private static String qRel_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance\\relevance\\qrel";
-    //private static String queries_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance\\relevance\\queries";
-    //private static String qRel_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance_Cranfield\\relevance\\qrel";
-    //private static String queries_path = "C:\\Users\\bhavy\\Desktop\\SET\\Relevance_Cranfield\\relevance\\queries";
-    //private static String qRel_path = "/Users/dayanarios/relevance_parks/relevance/qrel.txt";
-    //private static String queries_path = "/Users/dayanarios/relevance_parks/relevance/queries.txt";
-    private static String qRel_path = "/Users/dayanarios/relevance_cranfield/relevance/qrel.txt";
-    private static String queries_path = "/Users/dayanarios/relevance_cranfield/relevance/queries.txt";
+    private String qRel_path ;
+    private String queries_path ;
+  // private static String queries_path = "/Users/dayanarios/relevance_cranfield/relevance/queries.txt";
     
 
     private HashMap<String, List> qRel = new HashMap();
@@ -40,13 +35,14 @@ public class MAP {
     
     
 
-    public MAP() throws FileNotFoundException {
-       
+    public MAP(String path) throws FileNotFoundException {
+        this.qRel_path=path+"\\relevance\\qrel";
+        this.queries_path=path+"\\relevance\\queries";
         readFiles();
     }
 
     //read qrel and queries store the data into qRel hash map<query, qrel>
-    public void readFiles() throws FileNotFoundException {
+    private void readFiles() throws FileNotFoundException {
         
         File f = new File(qRel_path);
         File f1 = new File(queries_path);
@@ -59,7 +55,8 @@ public class MAP {
             //List<Integer> x1 = new ArrayList<>();
             for (int i = 0; i < s1.length; i++) {
                 if (s1[i].equals("")) {
-                } else {
+                }
+                else {
                     int p = Integer.parseInt(s1[i]);
                     filenames.add(p);
                 }
@@ -67,7 +64,7 @@ public class MAP {
             qRel.put(sc1.nextLine(), filenames);
         }
         
-        
+       // System.out.println("reading files completed");
     }
 
     //add results from ranked retreival to hash map
@@ -80,11 +77,7 @@ public class MAP {
             docs.add(Integer.parseInt(temp));
         }
 
-        /*
-        for (Integer s : docs){
-            System.out.println(s); 
-        }
-        */
+       
         poseRel.put(key, docs);
 
     }
@@ -97,8 +90,9 @@ public class MAP {
     * Functions calculationg MAP, throughput, mean response time below
      */
     public void calc_avgPrecision() {
+        int count=0;
         for (String query : qRel.keySet()) {
-            //System.out.println("\nPrecision of: " + query);;
+            
             numQueries++;
             List<Integer> relevant = qRel.get(query);
             List<Integer> candidates = poseRel.get(query);
@@ -116,15 +110,15 @@ public class MAP {
                     p++;
                     double p_at_k = p / k;
                     double r_at_k = p/relevant.size();
-                    //System.out.println("Doc : " + doc + " P@" + k +": " + p_at_k + " R@" + k +" : " + r_at_k);
-                    //System.out.print(" P@K :" + p_at_k);
+          //          System.out.println("Document : " + doc + " P@" + k +": " + p_at_k + " R@" + k +" : " + r_at_k);
+              
                     precisions.add(p_at_k);
                 }
                 else{
                     double p_at_k = p / k;
                     double r_at_k = p/relevant.size();
-                    //System.out.println("Doc : " + k + " P@K : " + p_at_k + " R@K : " + r_at_k); 
-                    
+          //          System.out.println("Document : " + doc + " P@" + k +": " + p_at_k + " R@" + k +" : " + r_at_k);
+                
                 }
             }
 
@@ -160,12 +154,13 @@ public class MAP {
     }
     
     public double calculae_mean_response_time(long time){
-        double seconds = (double) time / 1000000000.0;
+        double seconds = (double) time /1000;
         double mean_time= (seconds/numQueries);
         return mean_time ;
     }
     public double calculate_throughput(long time){
-        double seconds = (double) time / 1000000000.0;
+        
+        double seconds = (double) time / 1000;
         double throughput= numQueries/seconds ;
         
         return throughput;
