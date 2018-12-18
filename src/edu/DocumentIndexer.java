@@ -483,7 +483,7 @@ public class DocumentIndexer {
         MAP mean_ap = new MAP(path);
         //returns qRel.keyset() i.e. queries 
         Set<String> queries = mean_ap.getQueries();
-        
+        List<Long> time_per_query = new ArrayList<>();
         //run ranked retrival for each query
         for (String q : queries){
             time=0;
@@ -522,7 +522,7 @@ public class DocumentIndexer {
                     postings = disk_posIndex.getPosting_noPos(term);
                    long t3=System.currentTimeMillis();
                    time=time+(t3-t2);
-         
+                   
                 for (Posting p : postings) { //for each document in the postings list
                     double t_fd = p.getT_fd();
                     double d_ft = p.getD_ft();
@@ -567,7 +567,7 @@ public class DocumentIndexer {
                 results.add(queue.poll());  //gets the posting acc pair and returns only posting
 
             }
-
+            time_per_query.add(time);
             List<String> filenames = get_RankedResults(results); 
             //testing
           //  System.out.println(q);
@@ -582,12 +582,12 @@ public class DocumentIndexer {
             System.out.println("\n" + mapDisplay);
             
             //long total_time=end_time-start_time;
-            double throughput_result = mean_ap.calculate_throughput(time);
+            double throughput_result = mean_ap.calculate_throughput(time_per_query);
             String throughput_Display = "Throughput of the system is: " + throughput_result;
             GUI.JListModel.addElement(throughput_Display);
             System.out.println(throughput_Display);
             
-            double mrt_result = mean_ap.calculae_mean_response_time(time);
+            double mrt_result = mean_ap.calculae_mean_response_time(time_per_query);
             String mrt_Display = "Mean Response Time of the system is: " + mrt_result;
             GUI.JListModel.addElement(mrt_Display);
             System.out.println(mrt_Display);

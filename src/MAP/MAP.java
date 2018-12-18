@@ -153,14 +153,21 @@ public class MAP {
         return (sum / numQueries);
     }
     
-    public double calculae_mean_response_time(long time){
-        double seconds = (double) time /1000;
+    public double calculae_mean_response_time(List<Long> time){
+        double seconds=0;
+        for(long d:time){
+            seconds = seconds + (double) d /1000;
+        }
         double mean_time= (seconds/numQueries);
         return mean_time ;
     }
-    public double calculate_throughput(long time){
+    public double calculate_throughput(List<Long> time){
         
-        double seconds = (double) time / 1000;
+        double seconds=0;
+        
+        for(long d:time){
+            seconds = seconds + (double) d/ 1000;
+        }
         double throughput= numQueries/seconds ;
         
         return throughput;
