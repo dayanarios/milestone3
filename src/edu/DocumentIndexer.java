@@ -54,16 +54,16 @@ public class DocumentIndexer {
     protected static Boolean rankedMode = false;
     protected static Boolean queryMode = true;
     protected static Boolean buildMode = false;
-    protected static Boolean prMode = false; 
+    protected static Boolean prMode = false;
     private int topK = 10; //search engine always returns the top K = 10 docs
     private static double N = 0; //corpus size
     private static String path;
     protected static int rankedOption = 0;
     private static DiskPositionalIndex Disk_posIndex;
     private static DiskIndexWriter diskWriter = new DiskIndexWriter();
-    private HashMap<String, List> qRel = new HashMap<String, List>(); 
-    private HashMap<String, List> poseRel = new HashMap<String, List>(); 
-    private static List <Double> tp = new ArrayList(); 
+    private HashMap<String, List> qRel = new HashMap<String, List>();
+    private HashMap<String, List> poseRel = new HashMap<String, List>();
+    private static List<Double> tp = new ArrayList();
 
     /**
      * Indexes the corpus given by the path parameter, records the time it takes
@@ -108,11 +108,10 @@ public class DocumentIndexer {
 
         if (booleanMode) {
             BooleanQueryMode(diskWriter, Disk_posIndex);
-        } else if(rankedMode){
+        } else if (rankedMode) {
 
             RankedQueryMode(diskWriter, Disk_posIndex);
-        }
-        else{
+        } else {
             prMode(diskWriter, Disk_posIndex);
         }
 
@@ -466,16 +465,17 @@ public class DocumentIndexer {
         }
         return false;
     }
-    
 
-    
-    private static void prMode(DiskIndexWriter diskWriter, DiskPositionalIndex disk_posIndex) throws ClassNotFoundException, InstantiationException, IllegalAccessException, FileNotFoundException{
-        long time=0;
+
+    /*
+        *   Executes ranked retrieval as our RankedQueryMode function but returns
+        *   relevant results as an array of file names to be used in the MAP 
+        *   class. 
+     */
+    private static void prMode(DiskIndexWriter diskWriter, DiskPositionalIndex disk_posIndex) throws ClassNotFoundException, InstantiationException, IllegalAccessException, FileNotFoundException {
+        long time = 0;
         GUI.JListModel.clear();
-        /*
-        *   Ranked Retrieval as normal but stores results in an array
-        */
-       
+
         if (query.equals("q")) {
 
             System.exit(0);
@@ -485,21 +485,21 @@ public class DocumentIndexer {
         Set<String> queries = mean_ap.getQueries();
         List<Long> time_per_query = new ArrayList<>();
         //run ranked retrival for each query
-        for (String q : queries){
-            time=0;
+        for (String q : queries) {
+            time = 0;
             List<String> word = new ArrayList();
-            
-            query = q; 
-            long start=System.currentTimeMillis();
-        
+
+            query = q;
+            long start = System.currentTimeMillis();
+
             String[] query_array = query.split("\\s+");
             TokenProcessor processor = new NewTokenProcessor();
 
             for (int i = 0; i < query_array.length; i++) {
                 word.add(processor.processToken(query_array[i]).get(0));
             }
-            long t1=System.currentTimeMillis();
-            time=t1-start; //time to parse
+            long t1 = System.currentTimeMillis();
+            time = t1 - start; //time to parse
             StrategyFactory sf = new StrategyFactory();
             StrategyInterface strategy = sf.execute(rankedOption);
 
@@ -510,39 +510,39 @@ public class DocumentIndexer {
 
             List<Posting> postings = new ArrayList<>();
             List<Doc_accum> results = new ArrayList<>();
-            
+
             for (String term : word) {
-                    long t2=System.currentTimeMillis();   
-     
-                if(term.equals("")){
+                long t2 = System.currentTimeMillis();
+
+                if (term.equals("")) {
                     continue;
-                }
-                else{
-                
+                } else {
+
                     postings = disk_posIndex.getPosting_noPos(term);
-                   long t3=System.currentTimeMillis();
-                   time=time+(t3-t2);
-                   
-                for (Posting p : postings) { //for each document in the postings list
-                    double t_fd = p.getT_fd();
-                    double d_ft = p.getD_ft();
-                    double w_qt = strategy.calculate_wqt(N, d_ft);
-                    double accum = 0;
-                    double w_dt = strategy.get_wdt(t_fd, disk_posIndex, p.getDocumentId());
+                    long t3 = System.currentTimeMillis();
+                    time = time + (t3 - t2);
 
-                    //pairs (Ranked_posting, accumulator factor)
-                    if (postingMap.containsKey(p.getDocumentId())) {
-                        accum = postingMap.get(p.getDocumentId()).getAccumulator();
-                        accum += (w_qt * w_dt);
-                        postingMap.replace(p.getDocumentId(), new Doc_accum(p, accum)); //replaces old accum value
+                    for (Posting p : postings) { //for each document in the postings list
+                        double t_fd = p.getT_fd();
+                        double d_ft = p.getD_ft();
+                        double w_qt = strategy.calculate_wqt(N, d_ft);
+                        double accum = 0;
+                        double w_dt = strategy.get_wdt(t_fd, disk_posIndex, p.getDocumentId());
 
-                    } else {
-                        accum += (w_qt * w_dt);
-                        postingMap.put(p.getDocumentId(), new Doc_accum(p, accum));
+                        //pairs (Ranked_posting, accumulator factor)
+                        if (postingMap.containsKey(p.getDocumentId())) {
+                            accum = postingMap.get(p.getDocumentId()).getAccumulator();
+                            accum += (w_qt * w_dt);
+                            postingMap.replace(p.getDocumentId(), new Doc_accum(p, accum)); //replaces old accum value
+
+                        } else {
+                            accum += (w_qt * w_dt);
+                            postingMap.put(p.getDocumentId(), new Doc_accum(p, accum));
+                        }
                     }
-                }
 
-            }}
+                }
+            }
             for (Integer p : postingMap.keySet()) {
                 Doc_accum doc_temp = postingMap.get(p);
                 double accum = doc_temp.getAccumulator(); //gets accum associated with doc
@@ -568,36 +568,35 @@ public class DocumentIndexer {
 
             }
             time_per_query.add(time);
-            List<String> filenames = get_RankedResults(results); 
-            //testing
-          //  System.out.println(q);
+            List<String> filenames = get_RankedResults(results);
+
             mean_ap.add_poseRel(q, filenames);
-                
-           
+
         }
-            //long end_time=System.nanoTime();
-            double map_result = mean_ap.mean_ap();
-            String mapDisplay = "Mean average precision: " + map_result; 
-            GUI.JListModel.addElement(mapDisplay);
-            System.out.println("\n" + mapDisplay);
-            
-            //long total_time=end_time-start_time;
-            double throughput_result = mean_ap.calculate_throughput(time_per_query);
-            String throughput_Display = "Throughput of the system is: " + throughput_result;
-            GUI.JListModel.addElement(throughput_Display);
-            System.out.println(throughput_Display);
-            
-            double mrt_result = mean_ap.calculae_mean_response_time(time_per_query);
-            String mrt_Display = "Mean Response Time of the system is: " + mrt_result;
-            GUI.JListModel.addElement(mrt_Display);
-            System.out.println(mrt_Display);
-            
+
+        double map_result = mean_ap.mean_ap();
+        String mapDisplay = "Mean average precision: " + map_result;
+        GUI.JListModel.addElement(mapDisplay);
+        System.out.println("\n" + mapDisplay);
+
+        double throughput_result = mean_ap.calculate_throughput(time_per_query);
+        String throughput_Display = "Throughput of the system is: " + throughput_result;
+        GUI.JListModel.addElement(throughput_Display);
+        System.out.println(throughput_Display);
+
+        double mrt_result = mean_ap.calculae_mean_response_time(time_per_query);
+        String mrt_Display = "Mean Response Time of the system is: " + mrt_result;
+        GUI.JListModel.addElement(mrt_Display);
+        System.out.println(mrt_Display);
 
     }
-    
+
+    /*
+    *   Returns filenames of relevant docs
+     */
     public static List<String> get_RankedResults(List<Doc_accum> results) {
-        List<String> filenames = new ArrayList(); 
-        
+        List<String> filenames = new ArrayList();
+
         if (results.isEmpty()) {
             GUI.JListModel.clear();
             GUI.ResultsLabel.setText("");
@@ -621,18 +620,16 @@ public class DocumentIndexer {
                 }
                 //docInfo = corpus.getDocument(p.getPosting().getDocumentId()).getTitle();
                 docInfo = corpus.getDocument(p.getPosting().getDocumentId()).getFileName().toString();
-                filenames.add(docInfo); 
+                filenames.add(docInfo);
 
             }
-            //GUI.ResultsLabel.setText("Total Documents Found: " + results.size());
         }
 
-        //GUI.SearchBarTextField.setText("Enter a new search or 'q' to exit");
         GUI.SearchBarTextField.selectAll();
-        
-        return filenames; 
+
+        return filenames;
     }
-    
+
     public static void TP30(double time) {
         tp.add(time);
         System.out.println("iteration number: " + tp.size());
@@ -647,6 +644,4 @@ public class DocumentIndexer {
         }
     }
 
-
-    
 }
